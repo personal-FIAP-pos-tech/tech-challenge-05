@@ -1,0 +1,5 @@
+# Sobrescreve apenas o necessário para os testes: cada contexto Spring ganha seu próprio banco em memória,
+# evitando que contextos diferentes na mesma JVM tentem recriar as mesmas tabelas.
+spring:
+  datasource:
+    url: jdbc:h2:mem:${random.uuid};DB_CLOSE_DELAY=-1

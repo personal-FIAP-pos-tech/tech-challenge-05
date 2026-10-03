@@ -46,6 +46,7 @@ public class SecurityConfig {
 						.requestMatchers(ROTAS_PUBLICAS).permitAll()
 						.requestMatchers("/moradores/me/**").hasRole("MORADOR")
 						.requestMatchers("/funcionarios/me/**").hasRole("PORTEIRO")
+						.requestMatchers("/encomendas/**").hasRole("PORTEIRO")
 						.anyRequest().authenticated())
 				.oauth2ResourceServer(servidor -> servidor
 						.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
