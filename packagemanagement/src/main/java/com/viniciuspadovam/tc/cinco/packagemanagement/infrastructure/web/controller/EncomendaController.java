@@ -8,6 +8,8 @@ import com.viniciuspadovam.tc.cinco.packagemanagement.domain.encomenda.StatusEnc
 import com.viniciuspadovam.tc.cinco.packagemanagement.infrastructure.web.dto.EncomendaResponse;
 import com.viniciuspadovam.tc.cinco.packagemanagement.infrastructure.web.dto.PaginaResponse;
 import com.viniciuspadovam.tc.cinco.packagemanagement.infrastructure.web.dto.RegistrarEncomendaRequest;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Encomendas", description = "Recebimento, consulta e baixa de encomendas pela portaria (perfil PORTEIRO)")
 @RestController
 @RequestMapping("/encomendas")
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ public class EncomendaController {
 	private final ListarEncomendasUseCase listarEncomendasUseCase;
 	private final BuscarEncomendaUseCase buscarEncomendaUseCase;
 
+	@Operation(summary = "Registra uma encomenda recebida e a coloca na fila de processamento")
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public EncomendaResponse registrar(@AuthenticationPrincipal Jwt jwt,
@@ -40,6 +44,7 @@ public class EncomendaController {
 		return EncomendaResponse.de(registrarEncomendaUseCase.executar(UsuarioLogado.id(jwt), request.paraCommand()));
 	}
 
+	@Operation(summary = "Lista encomendas com filtros por status e apartamento")
 	@GetMapping
 	public PaginaResponse<EncomendaResponse> listar(
 			@RequestParam(required = false) StatusEncomenda status,
@@ -50,11 +55,13 @@ public class EncomendaController {
 				EncomendaResponse::de);
 	}
 
+	@Operation(summary = "Consulta uma encomenda pelo id")
 	@GetMapping("/{id}")
 	public EncomendaResponse buscar(@PathVariable Long id) {
 		return EncomendaResponse.de(buscarEncomendaUseCase.executar(id));
 	}
 
+	@Operation(summary = "Dá baixa na retirada; exige a confirmação prévia do morador")
 	@PatchMapping("/{id}/retirada")
 	public EncomendaResponse registrarRetirada(@AuthenticationPrincipal Jwt jwt, @PathVariable Long id) {
 		return EncomendaResponse.de(registrarRetiradaUseCase.executar(UsuarioLogado.id(jwt), id));

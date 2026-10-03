@@ -10,6 +10,9 @@ import com.viniciuspadovam.tc.cinco.packagemanagement.infrastructure.web.dto.Cad
 import com.viniciuspadovam.tc.cinco.packagemanagement.infrastructure.web.dto.EncomendaResponse;
 import com.viniciuspadovam.tc.cinco.packagemanagement.infrastructure.web.dto.MoradorResponse;
 import com.viniciuspadovam.tc.cinco.packagemanagement.infrastructure.web.dto.NotificacaoResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Moradores", description = "Cadastro e dados do morador logado")
 @RestController
 @RequestMapping("/moradores")
 @RequiredArgsConstructor
@@ -35,23 +39,28 @@ public class MoradorController {
 	private final ListarEncomendasDoMoradorUseCase listarEncomendasDoMoradorUseCase;
 	private final ListarNotificacoesDoMoradorUseCase listarNotificacoesDoMoradorUseCase;
 
+	@Operation(summary = "Cadastra um morador (não exige login)")
+	@SecurityRequirements
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public MoradorResponse cadastrar(@Valid @RequestBody CadastrarMoradorRequest request) {
 		return MoradorResponse.de(cadastrarMoradorUseCase.executar(request.paraCommand()));
 	}
 
+	@Operation(summary = "Consulta os dados do morador logado")
 	@GetMapping("/me")
 	public MoradorResponse meusDados(@AuthenticationPrincipal Jwt jwt) {
 		return MoradorResponse.de(buscarMoradorUseCase.executar(UsuarioLogado.id(jwt)));
 	}
 
+	@Operation(summary = "Atualiza os dados do morador logado")
 	@PutMapping("/me")
 	public MoradorResponse atualizar(@AuthenticationPrincipal Jwt jwt,
 			@Valid @RequestBody AtualizarMoradorRequest request) {
 		return MoradorResponse.de(atualizarMoradorUseCase.executar(UsuarioLogado.id(jwt), request.paraCommand()));
 	}
 
+	@Operation(summary = "Lista as encomendas do morador logado")
 	@GetMapping("/me/encomendas")
 	public List<EncomendaResponse> minhasEncomendas(@AuthenticationPrincipal Jwt jwt) {
 		return listarEncomendasDoMoradorUseCase.executar(UsuarioLogado.id(jwt)).stream()
@@ -59,6 +68,7 @@ public class MoradorController {
 				.toList();
 	}
 
+	@Operation(summary = "Lista as notificações do morador logado")
 	@GetMapping("/me/notificacoes")
 	public List<NotificacaoResponse> minhasNotificacoes(@AuthenticationPrincipal Jwt jwt) {
 		return listarNotificacoesDoMoradorUseCase.executar(UsuarioLogado.id(jwt)).stream()
