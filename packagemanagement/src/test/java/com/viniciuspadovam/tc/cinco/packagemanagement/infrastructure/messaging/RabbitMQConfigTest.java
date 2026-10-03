@@ -22,7 +22,18 @@ class RabbitMQConfigTest {
 	}
 
 	@Test
-	void deveLigarFilasAosExchanges() {
+	void filaDeSaidaDeveSerDuravelEEnviarFalhasParaADlq() {
+		Queue fila = config.filaNotificacoesSaida();
+
+		assertThat(fila.getName()).isEqualTo(RabbitMQConfig.FILA_NOTIFICACOES_SAIDA);
+		assertThat(fila.isDurable()).isTrue();
+		assertThat(fila.getArguments())
+				.containsEntry("x-dead-letter-exchange", RabbitMQConfig.DLX)
+				.containsEntry("x-dead-letter-routing-key", RabbitMQConfig.FILA_NOTIFICACOES_SAIDA_DLQ);
+	}
+
+	@Test
+	void deveLigarFilasDeEntradaAosExchanges() {
 		Binding entrada = config.bindingEncomendasEntrada(config.filaEncomendasEntrada(), config.exchange());
 		Binding dlq = config.bindingEncomendasEntradaDlq(config.filaEncomendasEntradaDlq(), config.deadLetterExchange());
 
@@ -30,5 +41,16 @@ class RabbitMQConfigTest {
 		assertThat(entrada.getRoutingKey()).isEqualTo(RabbitMQConfig.ROTA_ENCOMENDA_RECEBIDA);
 		assertThat(dlq.getExchange()).isEqualTo(RabbitMQConfig.DLX);
 		assertThat(dlq.getDestination()).isEqualTo(RabbitMQConfig.FILA_ENCOMENDAS_ENTRADA_DLQ);
+	}
+
+	@Test
+	void deveLigarFilasDeSaidaAosExchanges() {
+		Binding saida = config.bindingNotificacoesSaida(config.filaNotificacoesSaida(), config.exchange());
+		Binding dlq = config.bindingNotificacoesSaidaDlq(config.filaNotificacoesSaidaDlq(),
+				config.deadLetterExchange());
+
+		assertThat(saida.getRoutingKey()).isEqualTo(RabbitMQConfig.ROTA_NOTIFICACAO);
+		assertThat(saida.getDestination()).isEqualTo(RabbitMQConfig.FILA_NOTIFICACOES_SAIDA);
+		assertThat(dlq.getDestination()).isEqualTo(RabbitMQConfig.FILA_NOTIFICACOES_SAIDA_DLQ);
 	}
 }

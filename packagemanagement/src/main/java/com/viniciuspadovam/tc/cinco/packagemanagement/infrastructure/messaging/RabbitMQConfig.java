@@ -20,6 +20,10 @@ public class RabbitMQConfig {
 	public static final String FILA_ENCOMENDAS_ENTRADA_DLQ = "encomendas.entrada.dlq";
 	public static final String ROTA_ENCOMENDA_RECEBIDA = "encomenda.recebida";
 
+	public static final String FILA_NOTIFICACOES_SAIDA = "notificacoes.saida";
+	public static final String FILA_NOTIFICACOES_SAIDA_DLQ = "notificacoes.saida.dlq";
+	public static final String ROTA_NOTIFICACAO = "notificacao.enviar";
+
 	@Bean
 	public DirectExchange exchange() {
 		return new DirectExchange(EXCHANGE);
@@ -32,15 +36,22 @@ public class RabbitMQConfig {
 
 	@Bean
 	public Queue filaEncomendasEntrada() {
-		return QueueBuilder.durable(FILA_ENCOMENDAS_ENTRADA)
-				.deadLetterExchange(DLX)
-				.deadLetterRoutingKey(FILA_ENCOMENDAS_ENTRADA_DLQ)
-				.build();
+		return filaComDlq(FILA_ENCOMENDAS_ENTRADA, FILA_ENCOMENDAS_ENTRADA_DLQ);
 	}
 
 	@Bean
 	public Queue filaEncomendasEntradaDlq() {
 		return QueueBuilder.durable(FILA_ENCOMENDAS_ENTRADA_DLQ).build();
+	}
+
+	@Bean
+	public Queue filaNotificacoesSaida() {
+		return filaComDlq(FILA_NOTIFICACOES_SAIDA, FILA_NOTIFICACOES_SAIDA_DLQ);
+	}
+
+	@Bean
+	public Queue filaNotificacoesSaidaDlq() {
+		return QueueBuilder.durable(FILA_NOTIFICACOES_SAIDA_DLQ).build();
 	}
 
 	@Bean
@@ -54,7 +65,24 @@ public class RabbitMQConfig {
 	}
 
 	@Bean
+	public Binding bindingNotificacoesSaida(Queue filaNotificacoesSaida, DirectExchange exchange) {
+		return BindingBuilder.bind(filaNotificacoesSaida).to(exchange).with(ROTA_NOTIFICACAO);
+	}
+
+	@Bean
+	public Binding bindingNotificacoesSaidaDlq(Queue filaNotificacoesSaidaDlq, DirectExchange deadLetterExchange) {
+		return BindingBuilder.bind(filaNotificacoesSaidaDlq).to(deadLetterExchange).with(FILA_NOTIFICACOES_SAIDA_DLQ);
+	}
+
+	@Bean
 	public MessageConverter messageConverter() {
 		return new JacksonJsonMessageConverter();
+	}
+
+	private static Queue filaComDlq(String nome, String dlq) {
+		return QueueBuilder.durable(nome)
+				.deadLetterExchange(DLX)
+				.deadLetterRoutingKey(dlq)
+				.build();
 	}
 }

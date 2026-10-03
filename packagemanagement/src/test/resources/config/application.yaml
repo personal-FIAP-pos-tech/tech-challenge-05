@@ -1,5 +1,11 @@
-# Sobrescreve apenas o necessário para os testes: cada contexto Spring ganha seu próprio banco em memória,
-# evitando que contextos diferentes na mesma JVM tentem recriar as mesmas tabelas.
+# Sobrescreve apenas o necessário para os testes:
+# - cada contexto Spring ganha seu próprio banco em memória, evitando que contextos diferentes
+#   na mesma JVM tentem recriar as mesmas tabelas;
+# - os consumidores do RabbitMQ não iniciam sozinhos (testes com broker real os ligam explicitamente).
 spring:
   datasource:
     url: jdbc:h2:mem:${random.uuid};DB_CLOSE_DELAY=-1
+  rabbitmq:
+    listener:
+      simple:
+        auto-startup: false

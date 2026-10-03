@@ -2,10 +2,14 @@ package com.viniciuspadovam.tc.cinco.packagemanagement.infrastructure.config;
 
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.gateway.EncomendaGateway;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.gateway.EncomendaRecebidaPublisher;
+import com.viniciuspadovam.tc.cinco.packagemanagement.application.gateway.EnvioEmailGateway;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.gateway.FuncionarioGateway;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.gateway.MoradorGateway;
+import com.viniciuspadovam.tc.cinco.packagemanagement.application.gateway.NotificacaoGateway;
+import com.viniciuspadovam.tc.cinco.packagemanagement.application.gateway.NotificacaoPublisher;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.gateway.SenhaEncoder;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.gateway.TokenProvider;
+import com.viniciuspadovam.tc.cinco.packagemanagement.application.gateway.UnidadeDeTrabalho;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.autenticacao.AutenticarUseCase;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.encomenda.RegistrarEncomendaUseCase;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.funcionario.AtualizarFuncionarioUseCase;
@@ -14,6 +18,9 @@ import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.funcio
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.morador.AtualizarMoradorUseCase;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.morador.BuscarMoradorUseCase;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.morador.CadastrarMoradorUseCase;
+import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.notificacao.EnviarNotificacaoUseCase;
+import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.notificacao.ProcessarEncomendaRecebidaUseCase;
+import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.notificacao.RegistrarFalhaNotificacaoUseCase;
 import java.time.Clock;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -58,6 +65,27 @@ public class UseCaseConfig {
 	public RegistrarEncomendaUseCase registrarEncomendaUseCase(MoradorGateway moradorGateway,
 			EncomendaGateway encomendaGateway, EncomendaRecebidaPublisher encomendaRecebidaPublisher, Clock clock) {
 		return new RegistrarEncomendaUseCase(moradorGateway, encomendaGateway, encomendaRecebidaPublisher, clock);
+	}
+
+	@Bean
+	public ProcessarEncomendaRecebidaUseCase processarEncomendaRecebidaUseCase(EncomendaGateway encomendaGateway,
+			MoradorGateway moradorGateway, NotificacaoGateway notificacaoGateway,
+			NotificacaoPublisher notificacaoPublisher, Clock clock) {
+		return new ProcessarEncomendaRecebidaUseCase(encomendaGateway, moradorGateway, notificacaoGateway,
+				notificacaoPublisher, clock);
+	}
+
+	@Bean
+	public EnviarNotificacaoUseCase enviarNotificacaoUseCase(NotificacaoGateway notificacaoGateway,
+			EncomendaGateway encomendaGateway, EnvioEmailGateway envioEmailGateway,
+			UnidadeDeTrabalho unidadeDeTrabalho, Clock clock) {
+		return new EnviarNotificacaoUseCase(notificacaoGateway, encomendaGateway, envioEmailGateway,
+				unidadeDeTrabalho, clock);
+	}
+
+	@Bean
+	public RegistrarFalhaNotificacaoUseCase registrarFalhaNotificacaoUseCase(NotificacaoGateway notificacaoGateway) {
+		return new RegistrarFalhaNotificacaoUseCase(notificacaoGateway);
 	}
 
 	@Bean
