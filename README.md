@@ -4,6 +4,8 @@ Sistema para a portaria de prédios residenciais. O porteiro registra as encomen
 
 Construído com **Java 25**, **Spring Boot 4.1**, **Clean Architecture** e **TDD**.
 
+O relatório técnico, com as tecnologias, os desafios enfrentados e as soluções adotadas, está em [docs/relatorio-tecnico.md](docs/relatorio-tecnico.md).
+
 ## Sumário
 
 - [Como executar](#como-executar)
