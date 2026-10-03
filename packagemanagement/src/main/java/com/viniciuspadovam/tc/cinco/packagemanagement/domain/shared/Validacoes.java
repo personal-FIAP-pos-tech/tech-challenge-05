@@ -10,6 +10,8 @@ public final class Validacoes {
 	private static final Pattern TELEFONE = Pattern.compile("^\\d{10,11}$");
 	private static final Pattern APARTAMENTO = Pattern.compile("^[A-Za-z0-9-]{1,10}$");
 	private static final Pattern MASCARA_TELEFONE = Pattern.compile("[\\s()\\-+.]");
+	private static final int SENHA_TAMANHO_MINIMO = 8;
+	private static final int SENHA_TAMANHO_MAXIMO = 72;
 
 	private Validacoes() {
 	}
@@ -43,6 +45,15 @@ public final class Validacoes {
 			throw new DadosInvalidosException("O e-mail informado é inválido.");
 		}
 		return valor;
+	}
+
+	public static String senha(String senha) {
+		if (senha == null || senha.isBlank()
+				|| senha.length() < SENHA_TAMANHO_MINIMO || senha.length() > SENHA_TAMANHO_MAXIMO) {
+			throw new DadosInvalidosException("A senha deve ter entre " + SENHA_TAMANHO_MINIMO + " e "
+					+ SENHA_TAMANHO_MAXIMO + " caracteres.");
+		}
+		return senha;
 	}
 
 	public static String telefone(String telefone) {
