@@ -2,6 +2,7 @@ package com.viniciuspadovam.tc.cinco.packagemanagement.infrastructure.persistenc
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.Pagina;
 import com.viniciuspadovam.tc.cinco.packagemanagement.domain.encomenda.Encomenda;
 import com.viniciuspadovam.tc.cinco.packagemanagement.domain.encomenda.StatusEncomenda;
 import java.time.LocalDateTime;
@@ -57,5 +58,38 @@ class EncomendaJpaGatewayTest {
 	@Test
 	void deveRetornarVazioQuandoEncomendaNaoExiste() {
 		assertThat(gateway.buscarPorId(999L)).isEmpty();
+	}
+
+	@Test
+	void deveListarTodasAsEncomendasDaMaisRecenteParaAMaisAntiga() {
+		Pagina<Encomenda> pagina = gateway.listar(null, null, 0, 4);
+
+		assertThat(pagina.totalElementos()).isEqualTo(6);
+		assertThat(pagina.totalPaginas()).isEqualTo(2);
+		assertThat(pagina.conteudo()).extracting(Encomenda::getId).containsExactly(6L, 5L, 4L, 3L);
+	}
+
+	@Test
+	void deveFiltrarPorStatus() {
+		Pagina<Encomenda> pagina = gateway.listar(StatusEncomenda.RETIRADA, null, 0, 20);
+
+		assertThat(pagina.conteudo()).extracting(Encomenda::getId).containsExactly(6L, 5L);
+	}
+
+	@Test
+	void deveFiltrarPorStatusEApartamento() {
+		assertThat(gateway.listar(StatusEncomenda.NOTIFICADA, "201", 0, 20).conteudo())
+				.extracting(Encomenda::getId).containsExactly(3L);
+		assertThat(gateway.listar(null, "101", 0, 20).conteudo())
+				.extracting(Encomenda::getId).containsExactly(1L);
+	}
+
+	@Test
+	void deveListarEncomendasDoMorador() {
+		gateway.salvar(Encomenda.receber(2L, "Bruno Lima", "102", "Outra caixa", 3L, RECEBIMENTO));
+
+		assertThat(gateway.listarPorMorador(2L))
+				.extracting(Encomenda::getDescricao)
+				.containsExactly("Outra caixa", "Envelope - Correios");
 	}
 }

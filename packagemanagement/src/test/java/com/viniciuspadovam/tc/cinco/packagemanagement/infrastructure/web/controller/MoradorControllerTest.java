@@ -14,14 +14,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.exception.ConflitoException;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.exception.RecursoNaoEncontradoException;
+import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.encomenda.ListarEncomendasDoMoradorUseCase;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.morador.AtualizarMoradorCommand;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.morador.AtualizarMoradorUseCase;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.morador.BuscarMoradorUseCase;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.morador.CadastrarMoradorCommand;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.morador.CadastrarMoradorUseCase;
+import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.notificacao.ListarNotificacoesDoMoradorUseCase;
+import com.viniciuspadovam.tc.cinco.packagemanagement.domain.encomenda.Encomenda;
+import com.viniciuspadovam.tc.cinco.packagemanagement.domain.encomenda.StatusEncomenda;
 import com.viniciuspadovam.tc.cinco.packagemanagement.domain.exception.DadosInvalidosException;
 import com.viniciuspadovam.tc.cinco.packagemanagement.domain.morador.Morador;
+import com.viniciuspadovam.tc.cinco.packagemanagement.domain.notificacao.Notificacao;
+import com.viniciuspadovam.tc.cinco.packagemanagement.domain.notificacao.StatusNotificacao;
 import com.viniciuspadovam.tc.cinco.packagemanagement.infrastructure.security.SecurityConfig;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -65,6 +73,12 @@ class MoradorControllerTest {
 
 	@MockitoBean
 	private BuscarMoradorUseCase buscarMoradorUseCase;
+
+	@MockitoBean
+	private ListarEncomendasDoMoradorUseCase listarEncomendasDoMoradorUseCase;
+
+	@MockitoBean
+	private ListarNotificacoesDoMoradorUseCase listarNotificacoesDoMoradorUseCase;
 
 	private final Morador ana = Morador.restaurar(1L, "Ana Souza", "ana@email.com", "hash", "11988887777", "101");
 
@@ -171,6 +185,37 @@ class MoradorControllerTest {
 				.andExpect(jsonPath("$.nome").value("Ana Maria"))
 				.andExpect(jsonPath("$.apartamento").value("202"));
 		verify(atualizarMoradorUseCase).executar(1L, new AtualizarMoradorCommand("Ana Maria", "1122223333", "202", null));
+	}
+
+	@Test
+	void deveListarEncomendasDoMoradorLogado() throws Exception {
+		when(listarEncomendasDoMoradorUseCase.executar(1L)).thenReturn(List.of(Encomenda.restaurar(30L, 1L,
+				"Ana Souza", "101", "Caixa", StatusEncomenda.NOTIFICADA, LocalDateTime.of(2026, 10, 1, 9, 0), 5L,
+				LocalDateTime.of(2026, 10, 1, 9, 1), null, null, null)));
+
+		mockMvc.perform(get("/moradores/me/encomendas").with(morador(1L)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$[0].id").value(30))
+				.andExpect(jsonPath("$[0].status").value("NOTIFICADA"));
+	}
+
+	@Test
+	void deveListarNotificacoesDoMoradorLogado() throws Exception {
+		when(listarNotificacoesDoMoradorUseCase.executar(1L)).thenReturn(List.of(Notificacao.restaurar(70L, 30L,
+				1L, "ana@email.com", "Assunto", "Mensagem", StatusNotificacao.ENVIADA,
+				LocalDateTime.of(2026, 10, 1, 9, 1), LocalDateTime.of(2026, 10, 1, 9, 2), null)));
+
+		mockMvc.perform(get("/moradores/me/notificacoes").with(morador(1L)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$[0].id").value(70))
+				.andExpect(jsonPath("$[0].encomendaId").value(30))
+				.andExpect(jsonPath("$[0].status").value("ENVIADA"));
+	}
+
+	@Test
+	void porteiroNaoPodeListarNotificacoesDeMorador() throws Exception {
+		mockMvc.perform(get("/moradores/me/notificacoes").with(porteiro(5L)))
+				.andExpect(status().isForbidden());
 	}
 
 	@Test

@@ -4,6 +4,7 @@ import com.viniciuspadovam.tc.cinco.packagemanagement.application.gateway.Notifi
 import com.viniciuspadovam.tc.cinco.packagemanagement.domain.notificacao.Notificacao;
 import com.viniciuspadovam.tc.cinco.packagemanagement.infrastructure.persistence.entity.NotificacaoEntity;
 import com.viniciuspadovam.tc.cinco.packagemanagement.infrastructure.persistence.repository.NotificacaoRepository;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,13 @@ public class NotificacaoJpaGateway implements NotificacaoGateway {
 	@Override
 	public Optional<Notificacao> buscarPorEncomendaId(Long encomendaId) {
 		return repository.findByEncomendaId(encomendaId).map(NotificacaoJpaGateway::paraDominio);
+	}
+
+	@Override
+	public List<Notificacao> listarPorMorador(Long moradorId) {
+		return repository.findByMoradorIdOrderByDataCriacaoDesc(moradorId).stream()
+				.map(NotificacaoJpaGateway::paraDominio)
+				.toList();
 	}
 
 	static NotificacaoEntity paraEntidade(Notificacao notificacao) {

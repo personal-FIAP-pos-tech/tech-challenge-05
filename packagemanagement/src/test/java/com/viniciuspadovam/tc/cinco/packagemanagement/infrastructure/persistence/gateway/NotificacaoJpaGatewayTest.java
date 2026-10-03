@@ -1,6 +1,7 @@
 package com.viniciuspadovam.tc.cinco.packagemanagement.infrastructure.persistence.gateway;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import com.viniciuspadovam.tc.cinco.packagemanagement.domain.notificacao.Notificacao;
 import com.viniciuspadovam.tc.cinco.packagemanagement.domain.notificacao.StatusNotificacao;
@@ -56,6 +57,14 @@ class NotificacaoJpaGatewayTest {
 		Notificacao atualizada = gateway.buscarPorId(2L).orElseThrow();
 		assertThat(atualizada.getStatus()).isEqualTo(StatusNotificacao.CONFIRMADA);
 		assertThat(atualizada.getDataConfirmacao()).isEqualTo(confirmacao);
+	}
+
+	@Test
+	void deveListarNotificacoesDoMorador() {
+		assertThat(gateway.listarPorMorador(4L))
+				.extracting(Notificacao::getId, Notificacao::getStatus)
+				.containsExactly(tuple(4L, StatusNotificacao.CONFIRMADA));
+		assertThat(gateway.listarPorMorador(999L)).isEmpty();
 	}
 
 	@Test

@@ -11,14 +11,20 @@ import com.viniciuspadovam.tc.cinco.packagemanagement.application.gateway.SenhaE
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.gateway.TokenProvider;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.gateway.UnidadeDeTrabalho;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.autenticacao.AutenticarUseCase;
+import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.encomenda.BuscarEncomendaUseCase;
+import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.encomenda.ListarEncomendasDoMoradorUseCase;
+import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.encomenda.ListarEncomendasUseCase;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.encomenda.RegistrarEncomendaUseCase;
+import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.encomenda.RegistrarRetiradaUseCase;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.funcionario.AtualizarFuncionarioUseCase;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.funcionario.BuscarFuncionarioUseCase;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.funcionario.CadastrarFuncionarioUseCase;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.morador.AtualizarMoradorUseCase;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.morador.BuscarMoradorUseCase;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.morador.CadastrarMoradorUseCase;
+import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.notificacao.ConfirmarNotificacaoUseCase;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.notificacao.EnviarNotificacaoUseCase;
+import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.notificacao.ListarNotificacoesDoMoradorUseCase;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.notificacao.ProcessarEncomendaRecebidaUseCase;
 import com.viniciuspadovam.tc.cinco.packagemanagement.application.usecase.notificacao.RegistrarFalhaNotificacaoUseCase;
 import java.time.Clock;
@@ -86,6 +92,38 @@ public class UseCaseConfig {
 	@Bean
 	public RegistrarFalhaNotificacaoUseCase registrarFalhaNotificacaoUseCase(NotificacaoGateway notificacaoGateway) {
 		return new RegistrarFalhaNotificacaoUseCase(notificacaoGateway);
+	}
+
+	@Bean
+	public ConfirmarNotificacaoUseCase confirmarNotificacaoUseCase(NotificacaoGateway notificacaoGateway,
+			EncomendaGateway encomendaGateway, UnidadeDeTrabalho unidadeDeTrabalho, Clock clock) {
+		return new ConfirmarNotificacaoUseCase(notificacaoGateway, encomendaGateway, unidadeDeTrabalho, clock);
+	}
+
+	@Bean
+	public ListarNotificacoesDoMoradorUseCase listarNotificacoesDoMoradorUseCase(
+			NotificacaoGateway notificacaoGateway) {
+		return new ListarNotificacoesDoMoradorUseCase(notificacaoGateway);
+	}
+
+	@Bean
+	public RegistrarRetiradaUseCase registrarRetiradaUseCase(EncomendaGateway encomendaGateway, Clock clock) {
+		return new RegistrarRetiradaUseCase(encomendaGateway, clock);
+	}
+
+	@Bean
+	public ListarEncomendasUseCase listarEncomendasUseCase(EncomendaGateway encomendaGateway) {
+		return new ListarEncomendasUseCase(encomendaGateway);
+	}
+
+	@Bean
+	public BuscarEncomendaUseCase buscarEncomendaUseCase(EncomendaGateway encomendaGateway) {
+		return new BuscarEncomendaUseCase(encomendaGateway);
+	}
+
+	@Bean
+	public ListarEncomendasDoMoradorUseCase listarEncomendasDoMoradorUseCase(EncomendaGateway encomendaGateway) {
+		return new ListarEncomendasDoMoradorUseCase(encomendaGateway);
 	}
 
 	@Bean

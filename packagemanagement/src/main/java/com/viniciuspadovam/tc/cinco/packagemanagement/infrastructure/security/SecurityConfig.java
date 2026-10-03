@@ -47,6 +47,7 @@ public class SecurityConfig {
 						.requestMatchers("/moradores/me/**").hasRole("MORADOR")
 						.requestMatchers("/funcionarios/me/**").hasRole("PORTEIRO")
 						.requestMatchers("/encomendas/**").hasRole("PORTEIRO")
+						.requestMatchers("/notificacoes/**").hasRole("MORADOR")
 						.anyRequest().authenticated())
 				.oauth2ResourceServer(servidor -> servidor
 						.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));

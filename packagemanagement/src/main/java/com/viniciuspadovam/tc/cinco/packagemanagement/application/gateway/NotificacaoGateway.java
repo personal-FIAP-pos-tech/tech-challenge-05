@@ -1,6 +1,7 @@
 package com.viniciuspadovam.tc.cinco.packagemanagement.application.gateway;
 
 import com.viniciuspadovam.tc.cinco.packagemanagement.domain.notificacao.Notificacao;
+import java.util.List;
 import java.util.Optional;
 
 public interface NotificacaoGateway {
@@ -10,4 +11,6 @@ public interface NotificacaoGateway {
 	Optional<Notificacao> buscarPorId(Long id);
 
 	Optional<Notificacao> buscarPorEncomendaId(Long encomendaId);
+
+	List<Notificacao> listarPorMorador(Long moradorId);
 }
