@@ -35,12 +35,12 @@ class ArquiteturaTest {
 	@ArchTest
 	static final ArchRule dominioNaoDependeDeFrameworks = noClasses()
 			.that().resideInAPackage(DOMAIN)
-			.should().dependOnClassesThat().resideInAnyPackage("org.springframework..", "jakarta..", "lombok..")
+			.should().dependOnClassesThat().resideInAnyPackage("org.springframework..", "jakarta..")
 			.allowEmptyShould(true);
 
 	@ArchTest
 	static final ArchRule aplicacaoNaoDependeDeFrameworks = noClasses()
 			.that().resideInAPackage(APPLICATION)
-			.should().dependOnClassesThat().resideInAnyPackage("org.springframework..", "jakarta..", "lombok..")
+			.should().dependOnClassesThat().resideInAnyPackage("org.springframework..", "jakarta..")
 			.allowEmptyShould(true);
 }

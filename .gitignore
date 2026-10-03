@@ -1,0 +1,21 @@
+# Sistema Operacional
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editores e IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*.iml
+
+# Logs e arquivos temporários
+*.log
+*.tmp
+*.temp
+
+# Variáveis de ambiente e segredos
+.env
+.env.local
