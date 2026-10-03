@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Exclusões do SpotBugs, cada uma com a justificativa.
+-->
+<FindBugsFilter
+		xmlns="https://github.com/spotbugs/filter/3.0.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="https://github.com/spotbugs/filter/3.0.0 https://raw.githubusercontent.com/spotbugs/spotbugs/3.1.0/spotbugs/etc/findbugsfilter.xsd">
+
+	<!--
+		Os beans recebem suas dependências (gateways, repositórios, beans do Spring) por construtor
+		e guardam a referência. Isso é injeção de dependência intencional, não exposição de estado interno.
+	-->
+	<Match>
+		<Bug pattern="EI_EXPOSE_REP2"/>
+		<Package name="~com\.viniciuspadovam\.tc\.cinco\.packagemanagement\.(application|infrastructure)(\..*)?"/>
+	</Match>
+
+	<!--
+		As entidades de domínio validam invariantes no construtor e lançam exceção quando inválidas.
+		São classes final, então o ataque de finalizer apontado por CT_CONSTRUCTOR_THROW não se aplica.
+	-->
+	<Match>
+		<Bug pattern="CT_CONSTRUCTOR_THROW"/>
+		<Package name="~com\.viniciuspadovam\.tc\.cinco\.packagemanagement\.domain(\..*)?"/>
+	</Match>
+</FindBugsFilter>
