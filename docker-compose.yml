@@ -1,0 +1,39 @@
+services:
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: encomendas-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: encomendas-mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  app:
+    build: ./packagemanagement
+    container_name: encomendas-app
+    ports:
+      - "8080:8080"
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+      JWT_SECRET: ${JWT_SECRET:-tech-challenge-fase-5-chave-secreta-padrao-hs256}
+      JAVA_TOOL_OPTIONS: -Duser.timezone=America/Sao_Paulo
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
